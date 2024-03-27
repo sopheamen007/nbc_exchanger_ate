@@ -1,17 +1,8 @@
 {
-    "builds": [
-      {
-        "src": "package.json",
-        "use": "@vercel/node",
-        "config": {
-          "buildCommand": "npm install && cp .env.example .env"
-        }
-      }
-    ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "app.js"
+        "dest": "/"
       }
     ]
   }
