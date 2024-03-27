@@ -9,6 +9,7 @@ const GDT_WEBSITE = process.env.GDT_WEBSITE
 
 app.get('/nbc-exr-rate', (req, res) => {
     const date = req.query.date ?? '';
+
     scrapeNBC(date).then(function(data) {
         res.setHeader('Content-Type', 'text/plain');
         res.send(data);
@@ -17,6 +18,8 @@ app.get('/nbc-exr-rate', (req, res) => {
         res.status(500, {
             error: e
         });
+        // send email notification
+        
     });
 });
 
@@ -46,14 +49,31 @@ app.listen(PORT, function () {
     console.log(`app listening on port ${PORT}!`);
 });
 
+
 async function scrapeNBC(date) {
-    // Launch the browser and open a new blank page
-    const browser = await puppeteer.launch({headless: 'new'});
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
-    // Navigate the page to a URL
-    await page.goto(NBC_WEBSITE, { waitUntil: 'domcontentloaded' });
+    // Disable JavaScript for faster loading
+    await page.setJavaScriptEnabled(false);
 
+    // Block unnecessary resources
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+        if (['image', 'stylesheet', 'font'].includes(request.resourceType())) {
+            request.abort();
+        } else {
+            request.continue();
+        }
+    });
+
+    // Navigate to the NBC website with increased timeout
+    await page.goto(NBC_WEBSITE, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+    // Re-enable JavaScript if necessary for interactions
+    await page.setJavaScriptEnabled(true);
+
+    // Interact with the page
     await page.focus('#datepicker');
     await page.keyboard.down('Control');
     await page.keyboard.press('A');
@@ -62,14 +82,22 @@ async function scrapeNBC(date) {
     await page.keyboard.type(date);
     await page.click('input[type="submit"]');
 
-    let data = await page.evaluate(() => {
-        let date = document.querySelector("#fm-ex > table > tbody > tr:nth-child(1) > td > font").innerText
-        let rate = document.querySelector("#fm-ex > table > tbody > tr:nth-child(2) > td > font").innerText
-        return {exchange_date: date, exchange_rate: rate};
+    // Wait for the result to load
+    await page.waitForSelector("#fm-ex > table > tbody > tr:nth-child(1) > td > font");
+
+    // Extract the data
+    const data = await page.evaluate(() => {
+        const date = document.querySelector("#fm-ex > table > tbody > tr:nth-child(1) > td > font").innerText;
+        const rate = document.querySelector("#fm-ex > table > tbody > tr:nth-child(2) > td > font").innerText;
+        return { exchange_date: date, exchange_rate: rate };
     });
+
     await browser.close();
     return data;
 }
+
+
+
 
 async function scrapeNSSF() {
     try {
@@ -99,6 +127,9 @@ async function scrapeNSSF() {
         browser.close();
     }
 }
+
+
+
 
 
 async function scrapeExchangeRate() {
