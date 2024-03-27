@@ -11,11 +11,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "app.js",
-        "methods": ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
-        "config": {
-          "startCommand": "npm start"
-        }
+        "dest": "app.js"
       }
     ]
   }
