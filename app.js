@@ -2,6 +2,9 @@ const express = require("express")
 const puppeteer = require('puppeteer')
 const dotenv = require('dotenv').config()
 const app = express()
+// json to xml
+const js2xmlparser = require("js2xmlparser");
+
 const PORT = process.env.PORT
 const NBC_WEBSITE = process.env.NBC_WEBSITE
 const NSSF_WEBSITE = process.env.NSSF_WEBSITE
@@ -9,17 +12,31 @@ const GDT_WEBSITE = process.env.GDT_WEBSITE
 
 app.get('/nbc-exr-rate', (req, res) => {
     const date = req.query.date ?? '';
-
     scrapeNBC(date).then(function(data) {
         res.setHeader('Content-Type', 'text/plain');
-        res.send(data);
+        
+        // convert date
+        const date = new Date(data['exchange_date']);
+        const formattedDate = date.toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+
+        let newData = {
+            'item' : {
+                'title' : `1 USD = ${data['exchange_rate']} KHR`,
+                'pubDate' : formattedDate,
+                'targetCurrency' : 'KHR',
+                'exchangeRate' : data['exchange_rate']
+            }
+        }
+        const xmlData = js2xmlparser.parse("root", newData);
+        // console.log(data['exchange_rate']);
+        // res.send(data);
+        res.send(xmlData);
     })
     .catch(function (e) {
         res.status(500, {
             error: e
         });
         // send email notification
-        
     });
 });
 
