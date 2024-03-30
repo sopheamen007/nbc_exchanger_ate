@@ -73,7 +73,7 @@ app.listen(PORT, function () {
 
 
 async function scrapeNBC(date) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     // Disable JavaScript for faster loading
