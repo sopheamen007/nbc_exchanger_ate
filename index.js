@@ -40,6 +40,10 @@ app.get('/nbc-exr-rate', (req, res) => {
     });
 });
 
+app.get('/hello_world', (req, res) => {
+    res.send("hello_world");
+});
+
 app.get('/nssf-exr-rate', (req, res) => {
     scrapeNSSF().then(function(data) {
         res.send(data);
