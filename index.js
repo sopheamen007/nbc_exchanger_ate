@@ -6,7 +6,8 @@ const app = express()
 const js2xmlparser = require("js2xmlparser");
 
 const PORT = process.env.PORT
-const NBC_WEBSITE = process.env.NBC_WEBSITE
+// const NBC_WEBSITE = process.env.NBC_WEBSITE
+const NBC_WEBSITE = 'https://www.nbc.gov.kh/english/economic_research/exchange_rate.php'
 const NSSF_WEBSITE = process.env.NSSF_WEBSITE
 const GDT_WEBSITE = process.env.GDT_WEBSITE
 
