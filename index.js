@@ -10,7 +10,7 @@ const NBC_WEBSITE = process.env.NBC_WEBSITE
 const NSSF_WEBSITE = process.env.NSSF_WEBSITE
 const GDT_WEBSITE = process.env.GDT_WEBSITE
 
-app.get('/nbc-exr-rate', (req, res) => {
+app.get('/', (req, res) => {
     const date = req.query.date ?? '';
     scrapeNBC(date).then(function(data) {
         res.setHeader('Content-Type', 'text/plain');
