@@ -90,7 +90,7 @@ async function scrapeNBC(date) {
     });
 
     // Navigate to the NBC website with increased timeout
-    await page.goto(NBC_WEBSITE, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.goto(NBC_WEBSITE, { waitUntil: 'domcontentloaded', timeout: 100000 });
 
     // Re-enable JavaScript if necessary for interactions
     await page.setJavaScriptEnabled(true);
